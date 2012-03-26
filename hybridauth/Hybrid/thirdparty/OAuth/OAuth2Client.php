@@ -33,6 +33,7 @@ class OAuth2Client
 	public $curl_header           = array();
 	public $curl_useragent        = "OAuth/2 Simple PHP Client v0.1; HybridAuth http://hybridauth.sourceforge.net/";
 
+	public $curl_authenticate_method  = "POST";
 	//--
 
 	public $http_code             = "";
@@ -71,8 +72,9 @@ class OAuth2Client
 			"redirect_uri"  => $this->redirect_uri,
 			"code"          => $code
 		);
-
-		$response = $this->request( $this->token_url, $params, "POST" );
+	
+		$response = $this->request( $this->token_url, $params, $this->curl_authenticate_method );
+		
 		$response = $this->parseRequestResult( $response );
 
 		if( ! $response || ! isset( $response->access_token ) ){
@@ -207,9 +209,7 @@ class OAuth2Client
 			curl_setopt($ch, CURLOPT_POST, 1); 
 			if($params) curl_setopt( $ch, CURLOPT_POSTFIELDS, $params );
 		}
-
 		$response = curl_exec($ch);
-
 		Hybrid_Logger::debug( "OAuth2Client::request(). dump request info: ", serialize( curl_getinfo($ch) ) );
 		Hybrid_Logger::debug( "OAuth2Client::request(). dump request result: ", serialize( $response ) );
 
